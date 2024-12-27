@@ -224,12 +224,30 @@ export default function Home() {
         )}
       </AnimatePresence>
 
-      {/* Error */}
-      {state.phase === "error" && (
-        <div className="mx-auto mt-8 max-w-xl rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300">
-          <span className="font-medium text-white">Something went wrong.</span> {state.error}
-        </div>
-      )}
+      {/* Error / not-found */}
+      {state.phase === "error" &&
+        (state.notFound ? (
+          <div className="mx-auto mt-16 max-w-md rounded-xl border border-white/10 bg-white/[0.03] p-8 text-center">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 text-2xl">
+              🔍
+            </div>
+            <h3 className="text-lg font-semibold text-white">Company not found</h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-400">{state.error}</p>
+            <button
+              onClick={() => {
+                reset();
+                setCompany("");
+              }}
+              className="btn-accent mt-6 rounded-lg px-5 py-2 text-sm font-medium text-white cursor-pointer"
+            >
+              Try another company
+            </button>
+          </div>
+        ) : (
+          <div className="mx-auto mt-8 max-w-xl rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300">
+            <span className="font-medium text-white">Something went wrong.</span> {state.error}
+          </div>
+        ))}
 
       {/* Results */}
       {started && state.phase !== "error" && (

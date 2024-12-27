@@ -158,6 +158,14 @@ async function deepenNode(state: AgentStateType, config: LangGraphRunnableConfig
 
   const groups = await runSearches(broaderQueries, emit, "news");
 
+  // Prevent hitting the Groq 70B per-minute free tier limit by pacing the second pass
+  emit({
+    type: "node-start",
+    node: "analyze",
+    label: "Pacing rate limit (25s cooldown)...",
+  });
+  await new Promise((resolve) => setTimeout(resolve, 25000));
+
   emit({ type: "evidence", evidence: groups });
   emit({ type: "node-end", node: "research" });
   return { evidence: groups, deepened: true };
@@ -169,6 +177,9 @@ async function deepenNode(state: AgentStateType, config: LangGraphRunnableConfig
 // (We route on the analyst's judgment, not raw source count, because the web search
 // always returns *some* padded results even for obscure names.)
 function routeAfterAnalysis(state: AgentStateType): "deepen" | "decide" {
+  // If the name isn't a real company, don't bother deepening — go straight to decide,
+  // which short-circuits to a "not found" result.
+  if (state.analysis && !state.analysis.companyIdentified) return "decide";
   const lowData = state.analysis?.dataQuality === "low";
   return lowData && !state.deepened ? "deepen" : "decide";
 }
@@ -183,6 +194,10 @@ rationale for each:
 ${CATEGORY_GUIDE}
 
 Rules:
+- FIRST decide companyIdentified: set it TRUE only if the evidence actually describes a real,
+  identifiable company/organization with this (or a clearly equivalent) name. Set it FALSE if the
+  name looks like gibberish / a random string / a typo, or if no source genuinely describes such a
+  company. If FALSE, do NOT fabricate scores or facts — score conservatively and keep rationales honest.
 - Base every score strictly on the evidence. If a category has little or no evidence, score it
   conservatively (around 4-5) and SAY that the evidence was missing — do not guess.
 - Set dataQuality honestly: 'low' for small/obscure companies where you found little reliable info,
@@ -238,6 +253,17 @@ rather than overstating — honesty about what we couldn't verify is part of the
 async function decideNode(state: AgentStateType, config: LangGraphRunnableConfig) {
   const emit = emitter(config);
   emit({ type: "node-start", node: "decide", label: "Reaching a verdict" });
+
+  // 0) Not a real company → don't fabricate a verdict. Tell the user honestly.
+  if (state.analysis && !state.analysis.companyIdentified) {
+    emit({
+      type: "notfound",
+      company: state.company,
+      message: `We couldn't find a real company called "${state.company}". Please check the spelling or try a different company name.`,
+    });
+    emit({ type: "node-end", node: "decide" });
+    return {};
+  }
 
   // 1) Deterministic decision: weighted composite → threshold, capped by data quality.
   const dims = state.analysis?.dimensions ?? [];

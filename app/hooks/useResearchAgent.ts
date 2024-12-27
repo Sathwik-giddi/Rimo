@@ -30,6 +30,7 @@ export type ResearchState = {
   analysis?: Analysis;
   verdict?: Verdict;
   error?: string;
+  notFound?: boolean; // the input wasn't a real, identifiable company
 };
 
 const ORDER: NodeName[] = ["plan", "research", "analyze", "decide"];
@@ -87,6 +88,8 @@ function reduce(state: ResearchState, event: AgentEvent): ResearchState {
       return { ...state, analysis: event.analysis };
     case "verdict":
       return { ...state, verdict: event.verdict };
+    case "notfound":
+      return { ...state, phase: "error", error: event.message, notFound: true };
     case "error":
       return { ...state, phase: "error", error: event.message };
     case "done": {

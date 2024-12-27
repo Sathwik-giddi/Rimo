@@ -22,6 +22,8 @@ export type AgentEvent =
   | { type: "evidence"; evidence: EvidenceGroup[] }
   | { type: "analysis"; analysis: Analysis }
   | { type: "verdict"; verdict: Verdict }
+  // the named entity isn't a real, identifiable company
+  | { type: "notfound"; company: string; message: string }
   // terminal states
   | { type: "error"; message: string }
   | { type: "done" };

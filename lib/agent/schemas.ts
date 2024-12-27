@@ -57,6 +57,11 @@ export const AnalysisSchema = z.object({
     .describe(
       "Honest rating of how much reliable, relevant evidence was actually found. Use 'low' for small/obscure companies with little public information."
     ),
+  companyIdentified: z
+    .boolean()
+    .describe(
+      "TRUE only if the evidence actually describes a real, identifiable company or organization with this (or a clearly equivalent) name. Set FALSE if the name looks like gibberish / a random string / a typo, or if no source genuinely describes such a company — in that case do NOT invent any details."
+    ),
   summary: z
     .string()
     .describe("A concise synthesis of what the evidence says about this company as an investment."),
