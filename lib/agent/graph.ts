@@ -48,23 +48,26 @@ function emitter(config: LangGraphRunnableConfig) {
 // We cap sources-per-question and truncate each snippet: Tavily snippets are short
 // already, and trimming keeps us well under Groq's free-tier token-per-minute limit
 // while still giving the analyst enough signal.
-const MAX_SOURCES_PER_Q = 3;
-const MAX_SNIPPET_CHARS = 320;
+const MAX_SOURCES_PER_Q = 2;
+const MAX_SNIPPET_CHARS = 240;
+// Hard cap on total sources fed to the analyst. The deepen loop re-analyzes with
+// BOTH passes of evidence, so without a global cap an obscure-company run can spike
+// past Groq's per-minute token limit. We still list every question (so the model
+// sees what was searched) but stop attaching sources once the cap is reached.
+const MAX_TOTAL_SOURCES = 14;
 
 function formatEvidence(groups: EvidenceGroup[]): string {
   if (groups.length === 0) return "No evidence was retrieved.";
   let n = 0;
   return groups
     .map((g) => {
-      const items = [...g.sources]
-        .sort((a, b) => b.score - a.score)
-        .slice(0, MAX_SOURCES_PER_Q)
-        .map((s) => {
-          const snippet = s.content.slice(0, MAX_SNIPPET_CHARS);
-          return `  [${++n}] ${s.title}\n      ${s.url}\n      ${snippet}`;
-        })
-        .join("\n");
-      return `Q: ${g.question}\n${items || "  (no results)"}`;
+      const top = [...g.sources].sort((a, b) => b.score - a.score).slice(0, MAX_SOURCES_PER_Q);
+      const lines: string[] = [];
+      for (const s of top) {
+        if (n >= MAX_TOTAL_SOURCES) break;
+        lines.push(`  [${++n}] ${s.title}\n      ${s.url}\n      ${s.content.slice(0, MAX_SNIPPET_CHARS)}`);
+      }
+      return `Q: ${g.question}\n${lines.join("\n") || "  (no results)"}`;
     })
     .join("\n\n");
 }
@@ -145,12 +148,12 @@ async function deepenNode(state: AgentStateType, config: LangGraphRunnableConfig
   });
 
   const c = state.company;
+  // Kept lean (3 high-signal angles) so the re-analysis after deepening stays within
+  // the per-minute token budget.
   const broaderQueries = [
-    `${c} founders leadership team background`,
-    `${c} funding investors valuation`,
-    `${c} customers reviews reputation`,
-    `${c} news OR controversy OR lawsuit`,
-    `what does "${c}" do products services`,
+    `${c} founders funding investors`,
+    `what does "${c}" do products services customers`,
+    `${c} news OR reviews OR controversy`,
   ];
 
   const groups = await runSearches(broaderQueries, emit, "news");
