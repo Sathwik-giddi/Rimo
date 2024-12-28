@@ -190,10 +190,6 @@ Strong brand and large user base in a growing market; expansion into quick‑com
 
 Impressive revenue growth and a clear product niche, but limited public data on margins/cash flow → conviction is **deliberately tempered**, and the verdict *says so*.
 
-### ⛔ Zentary Microsystems (a made‑up name) → "Company not found" — refuses to hallucinate
-
-There is no real company by this name. Rather than invent a plausible‑looking verdict, the analyst sets `companyIdentified: false` and the agent short‑circuits to an honest **"Company not found"** card — the anti‑hallucination guardrail in action. (For companies that are real but merely *obscure*, it does the opposite: the deepen loop fires to give them a fair shot, and conviction is capped to the thin evidence — see Boult Audio above.)
-
 ---
 
 ## 6. What I would improve with more time
