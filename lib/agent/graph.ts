@@ -111,8 +111,12 @@ async function planNode(state: AgentStateType, config: LangGraphRunnableConfig) 
   emit({ type: "node-start", node: "plan", label: `Planning research for "${state.company}"` });
 
   // temperature 0 → reproducible questions → stable evidence → stable verdict
-  const llm = fastLLM(0).withStructuredOutput(ResearchPlanSchema, {
+  const model = fastLLM(0).withStructuredOutput(ResearchPlanSchema, {
     name: "research_plan", method: "jsonMode",  });
+  // If the 8B fast model fails, we don't have a smaller fallback, but we can try the 70B model as a last resort
+  const fallbackModel = reasoningLLM(0).withStructuredOutput(ResearchPlanSchema, {
+    name: "research_plan", method: "jsonMode",  });
+  const llm = model.withFallbacks({ fallbacks: [fallbackModel] });
   const plan = await llm.invoke([
     { role: "system", content: `${PLAN_SYSTEM}\n\n${jsonSchemaHint(ResearchPlanSchema, "research_plan")}` },
     { role: "user", content: `Company: ${state.company}` },
@@ -237,8 +241,11 @@ async function analyzeNode(state: AgentStateType, config: LangGraphRunnableConfi
 
   // temperature 0 so the same evidence yields the same scores → a stable, reproducible
   // verdict (no more "same score, different decision" across repeat runs).
-  const llm = reasoningLLM(0).withStructuredOutput(AnalysisSchema, {
+  const model = reasoningLLM(0).withStructuredOutput(AnalysisSchema, {
     name: "analysis", method: "jsonMode",  });
+  const fallbackModel = fastLLM(0).withStructuredOutput(AnalysisSchema, {
+    name: "analysis", method: "jsonMode",  });
+  const llm = model.withFallbacks({ fallbacks: [fallbackModel] });
   const raw = await llm.invoke([
     { role: "system", content: `${ANALYZE_SYSTEM}\n\n${jsonSchemaHint(AnalysisSchema, "analysis")}` },
     {
@@ -299,8 +306,11 @@ async function decideNode(state: AgentStateType, config: LangGraphRunnableConfig
   // 2) LLM writes the narrative to match the computed call. The decision itself is
   // already decided in code, so the fast model is enough here — saving the heavier
   // model's limited daily quota for the analysis step that actually needs reasoning.
-  const llm = fastLLM(0.3).withStructuredOutput(VerdictNarrativeSchema, {
+  const model = fastLLM(0.3).withStructuredOutput(VerdictNarrativeSchema, {
     name: "verdict_narrative", method: "jsonMode",  });
+  const fallbackModel = reasoningLLM(0.3).withStructuredOutput(VerdictNarrativeSchema, {
+    name: "verdict_narrative", method: "jsonMode",  });
+  const llm = model.withFallbacks({ fallbacks: [fallbackModel] });
   const narrative = await llm.invoke([
     { role: "system", content: `${DECIDE_SYSTEM}\n\n${jsonSchemaHint(VerdictNarrativeSchema, "verdict_narrative")}` },
     {

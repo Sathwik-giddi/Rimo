@@ -182,10 +182,10 @@ investment-research-agent/
 
 Strong moat (CUDA + ecosystem), excellent financials, dominant position in the AI/GPU market. Bull: data‑center growth, software moat, partnerships. Bear: competition (AMD/Intel), customer concentration, regulatory/supply‑chain risk.
 
-### 🟢 Zomato (Eternal Ltd) → INVEST · moderate conviction · evidence: medium–high
+### 🟡 Zomato (Eternal Ltd) → HOLD · weighted 6.2/10 · conviction 57 · evidence: high
 ![Zomato verdict](screenshots/zomato.png)
 
-Strong brand and large user base in a growing market; expansion into quick‑commerce. Surfaced the company's **own investor‑relations PDFs** and Moneycontrol as sources. Bear: profitability questions, regulatory risk, competition.
+A textbook nuanced call. The agent recognises the strengths — strong business fundamentals, a proven model and multiple revenue streams — but weighs them against **heavy losses, a high cash‑burn rate (quick‑commerce/Blinkit), and intense competition**, and lands on **HOLD** rather than forcing a buy. Its own thesis: *"we are holding onto Zomato due to its strong business fundamentals … but its heavy losses, high cash burn rate, and intense competition temper our enthusiasm."* This is exactly the discernment a real analyst applies to a quality‑but‑pricey growth story — not every good company is a good investment *today*.
 
 ### 🟡 Boult Audio (small Indian startup) → INVEST · conviction capped (medium data)
 ![Boult Audio verdict](screenshots/boult-audio.png)
