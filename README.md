@@ -10,6 +10,8 @@ Built for the **InsideIIM × AltUni AI Labs** — AI Product Development Enginee
 
 🔗 **Live demo:** **https://investment-research-agent-virid.vercel.app**
 
+> ⚠️ **Note on the live demo (free tier):** This runs on Groq's **free tier**, which has a daily token limit (~100k tokens/day, roughly ~30 analyses). If you see a *"rate limit / daily limit reached"* message, that cap was simply hit — it **resets automatically** (wait a little and retry), or run locally with your own free key (see [§2 How to run it](#2-how-to-run-it)). This is a hosting quota, not a bug — the agent logic is unaffected.
+
 ---
 
 ## 1. Overview — what it does
