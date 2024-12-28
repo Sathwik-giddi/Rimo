@@ -48,13 +48,18 @@ function emitter(config: LangGraphRunnableConfig) {
 // We cap sources-per-question and truncate each snippet: Tavily snippets are short
 // already, and trimming keeps us well under Groq's free-tier token-per-minute limit
 // while still giving the analyst enough signal.
-const MAX_SOURCES_PER_Q = 1;
-const MAX_SNIPPET_CHARS = 150;
+// The analyst can only be as accurate as the evidence it sees. Feeding one
+// 150-char headline per question made it score on vibes (famous bankrupt companies
+// scored as INVEST). We give it several real snippets per question instead — enough
+// signal to actually detect losses, debt and red flags — while a global cap keeps a
+// run within Groq's per-minute free-tier token budget.
+const MAX_SOURCES_PER_Q = 2;
+const MAX_SNIPPET_CHARS = 400;
 // Hard cap on total sources fed to the analyst. The deepen loop re-analyzes with
 // BOTH passes of evidence, so without a global cap an obscure-company run can spike
 // past Groq's per-minute token limit. We still list every question (so the model
 // sees what was searched) but stop attaching sources once the cap is reached.
-const MAX_TOTAL_SOURCES = 14;
+const MAX_TOTAL_SOURCES = 20;
 
 function formatEvidence(groups: EvidenceGroup[]): string {
   if (groups.length === 0) return "No evidence was retrieved.";
@@ -123,9 +128,16 @@ async function researchNode(state: AgentStateType, config: LangGraphRunnableConf
   const emit = emitter(config);
   emit({ type: "node-start", node: "research", label: "Researching the live web" });
 
-  const questions = state.plan?.questions?.length
+  const planned = state.plan?.questions?.length
     ? state.plan.questions
     : [`${state.company} company overview business model`];
+
+  // Always probe the bear case explicitly. Planner questions skew neutral/positive, so
+  // distress signals (losses, debt, bankruptcy, scandal) often never reach the analyst —
+  // which is exactly how a bankrupt company slipped through as a healthy score. This
+  // guaranteed risk query makes the negative evidence visible so it can be weighed.
+  const riskQuery = `${state.company} losses OR debt OR bankruptcy OR lawsuit OR layoffs OR scandal OR decline risks`;
+  const questions = [...planned, riskQuery];
 
   const groups = await runSearches(questions, emit);
 
@@ -185,22 +197,39 @@ function routeAfterAnalysis(state: AgentStateType): "deepen" | "decide" {
 // ── Node 3: Analyze ──────────────────────────────────────────────────────────
 const CATEGORY_GUIDE = CATEGORIES.map((c) => `- ${c.name}: ${c.focus}`).join("\n");
 
-const ANALYZE_SYSTEM = `You are an investment analyst. Using ONLY the evidence provided (never invent
-facts), score the company on each of these fixed categories from 0-10, with a short evidence-based
-rationale for each:
+const ANALYZE_SYSTEM = `You are a SKEPTICAL, evidence-driven investment analyst. Your job is to judge whether
+this company is a sound investment RIGHT NOW — not to be charitable, and not to be swayed by a famous
+name. Most companies are mediocre investments; a high score must be EARNED with clear positive evidence.
+
+Using ONLY the evidence provided (never invent facts), score the company 0-10 on each fixed category,
+with a short, evidence-based rationale for each:
 
 ${CATEGORY_GUIDE}
 
-Rules:
+Scoring rubric — apply strictly to EVERY category:
+- 0-2  Serious problems / red flags: losses, cash burn, negative or collapsing margins, heavy or
+       unsustainable debt, bankruptcy or insolvency, fraud, mass layoffs, down-rounds, executive /
+       auditor / board resignations, a shrinking business.
+- 3-4  Weak or concerning: negatives clearly outweigh positives, or a troubling trend.
+- 5    Genuinely mixed/neutral, OR evidence too thin to judge — say which.
+- 6-7  Solid: more strengths than weaknesses, backed by evidence.
+- 8-9  Strong and well-evidenced.
+- 10   Exceptional, with strong corroborating evidence.
+
+Hard rules:
 - FIRST decide companyIdentified: set it TRUE only if the evidence actually describes a real,
   identifiable company/organization with this (or a clearly equivalent) name. Set it FALSE if the
   name looks like gibberish / a random string / a typo, or if no source genuinely describes such a
-  company. If FALSE, do NOT fabricate scores or facts — score conservatively and keep rationales honest.
-- Base every score strictly on the evidence. If a category has little or no evidence, score it
-  conservatively (around 4-5) and SAY that the evidence was missing — do not guess.
+  company. If FALSE, do NOT fabricate scores or facts.
+- Weigh NEGATIVE evidence as heavily as positive. A company that is losing money, burning cash, in or
+  near bankruptcy, or mired in scandal MUST score 0-2 on Financial Health (and on Management &
+  Governance for fraud/governance failures) — regardless of brand, hype, or past glory.
+- Do NOT default to a comfortable middle. If the evidence is thin OR mostly negative, score LOW and
+  say so. Never reward a company just for being well-known.
+- Reserve 8-10 for companies with clearly demonstrated, evidenced strength.
 - Set dataQuality honestly: 'low' for small/obscure companies where you found little reliable info,
   'high' only when evidence was rich and consistent.
-- Finish with a concise synthesis of the investment picture.`;
+- Finish with a concise, honest synthesis, leading with the single biggest risk if one exists.`;
 
 async function analyzeNode(state: AgentStateType, config: LangGraphRunnableConfig) {
   const emit = emitter(config);

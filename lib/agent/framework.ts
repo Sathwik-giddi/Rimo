@@ -95,7 +95,7 @@ export function deriveVerdict(
   dataQuality: "high" | "medium" | "low"
 ): { decision: "INVEST" | "HOLD" | "PASS"; conviction: number } {
   const decision =
-    composite >= 6.5 ? "INVEST" : composite >= 4.5 ? "HOLD" : "PASS";
+    composite >= 7.0 ? "INVEST" : composite >= 4.5 ? "HOLD" : "PASS";
 
   // Distance from the neutral midpoint (5.5) → how decisive the call is (0..1).
   const decisiveness = Math.min(Math.abs(composite - 5.5) / 4.5, 1);

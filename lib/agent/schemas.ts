@@ -39,7 +39,7 @@ export const DimensionSchema = z.object({
     .min(0)
     .max(10)
     .describe(
-      "Score 0-10 for this category, justified ONLY by the gathered evidence. If there is little evidence for this category, score conservatively (around 4-5) and say so."
+      "Score 0-10 for this category per the scoring rubric, justified ONLY by the gathered evidence. Score LOW (0-2) for serious red flags (losses, cash burn, heavy debt, bankruptcy, fraud, scandal); do NOT inflate a famous name. If evidence is thin, score around 5 and say so."
     ),
   rationale: z
     .string()

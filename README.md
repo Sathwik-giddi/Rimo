@@ -27,6 +27,7 @@ It streams the whole thing live, so you watch the agent **plan → research → 
 - **Decide, don't dump** — it commits to a verdict + reasoning, instead of a wall of text.
 - **Cited & verifiable** — every claim traces back to a real source shown in the UI.
 - **Honest about uncertainty** — for companies with little public data, it *says so* and **caps its confidence** instead of bluffing.
+- **Refuses to invent** — a gibberish or non‑existent name gets an honest *"company not found,"* never a fabricated verdict.
 - **Works for any company size** — a reflect‑and‑retry loop gives small/unlisted startups a fair shot.
 - **Transparent decision** — the Invest/Hold/Pass call is a deterministic rule you can point to, not a black‑box LLM whim.
 
@@ -158,6 +159,7 @@ investment-research-agent/
 | **Cover small/obscure companies** | Most agents only work on famous names whose data is easy. A financial API would fail exactly the companies that need research | Built adaptive planning + a reflect‑and‑retry deepen loop instead of relying on structured feeds |
 | **Decision = deterministic weighted rule** | The Invest/Hold/Pass call is explainable math (weights → threshold), not an LLM's mood; the LLM only scores + writes prose | A linear weighted model is simpler than real investing (a future model could let the LLM override with justification) |
 | **Honest uncertainty (data‑quality conviction cap)** | An investment tool must never sound more certain than the data allows; a no‑data company gets an honest PASS at low conviction, not a hallucination | — |
+| **Refuse to invent companies** (not‑found guardrail) | An agent that hallucinates a verdict for a fake/garbled name is worse than useless; the analyst flags `companyIdentified: false` and the run short‑circuits to an honest "company not found" | A genuinely obscure *real* company could occasionally be misjudged as "not found" — mitigated by basing the call on retrieved evidence, not the name alone |
 | **Temperature 0 for scoring** | Same company → same verdict (reproducibility), instead of flipping across a threshold between runs | Live web data can still change over time (legitimately); Groq isn't bit‑deterministic |
 | **Hand‑built SVG charts** (no chart lib) | Small bundle, full control, fast on Vercel | More component code |
 | **Valuation multiples & ownership/short‑interest folded in / deferred** | They need market‑data feeds that don't exist for the small private companies we deliberately support | Best‑effort within Financial Health; documented limitation |
@@ -188,10 +190,9 @@ Strong brand and large user base in a growing market; expansion into quick‑com
 
 Impressive revenue growth and a clear product niche, but limited public data on margins/cash flow → conviction is **deliberately tempered**, and the verdict *says so*.
 
-### 🔴 Zentary Microsystems (deliberately obscure / near‑unknown) → PASS · low conviction
-![Zentary verdict](screenshots/zentary.png)
+### ⛔ Zentary Microsystems (a made‑up name) → "Company not found" — refuses to hallucinate
 
-First research pass returned little → the analyst rated data **low** → the **deepen loop fired** ("Limited public data — digging deeper") → still thin → honest **PASS** with the thesis: *"passing because the available data does not provide a clear picture … this is the absence of compelling evidence, not the presence of negative evidence."* — i.e. it refused to fabricate a confident verdict.
+There is no real company by this name. Rather than invent a plausible‑looking verdict, the analyst sets `companyIdentified: false` and the agent short‑circuits to an honest **"Company not found"** card — the anti‑hallucination guardrail in action. (For companies that are real but merely *obscure*, it does the opposite: the deepen loop fires to give them a fair shot, and conviction is capped to the thin evidence — see Boult Audio above.)
 
 ---
 
