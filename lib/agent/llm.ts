@@ -1,22 +1,25 @@
 import { ChatGroq } from "@langchain/groq";
 
 /**
- * LLM factory (Groq).
+ * LLM factory (Groq — blazing-fast open-source inference).
  *
- * The provider lives behind these two helpers, so swapping providers later
- * (OpenAI, Gemini, Anthropic, ...) is a one-file change — the graph never
- * imports a provider directly.
+ * The provider lives behind these two helpers so the graph never imports a
+ * provider directly — swapping providers later is a one-file change.
  *
- * - `reasoningLLM`  → Llama 3.3 70B: the heavier model for analysis & the final
- *   decision, where reasoning quality matters most.
- * - `fastLLM`       → Llama 3.1 8B Instant: cheap & quick, for the planning step.
+ * - `reasoningLLM` → the heavier model for analysis, where reasoning quality
+ *   matters most.  Default: llama-3.3-70b-versatile (12 000 TPM on free tier).
+ * - `fastLLM`      → cheap & quick for planning + verdict narrative.
+ *   Default: llama-3.1-8b-instant (separate 6 000 TPM bucket).
+ *
+ * Splitting across two model sizes means their per-minute token buckets are
+ * independent, so a full run (plan on 8B + analyze on 70B + decide on 8B)
+ * fits comfortably without pacing delays.
  */
 
-// Models are env-overridable so you can trade quality vs. throughput without code
-// changes. Each Groq model has its OWN daily token bucket, so dropping the reasoning
-// model to 8B also dodges the 70B bucket when it's exhausted on the free tier.
-const REASONING_MODEL = process.env.GROQ_REASONING_MODEL || "llama-3.3-70b-versatile";
-const FAST_MODEL = process.env.GROQ_FAST_MODEL || "llama-3.1-8b-instant";
+const REASONING_MODEL =
+  process.env.GROQ_REASONING_MODEL || "llama-3.3-70b-versatile";
+const FAST_MODEL =
+  process.env.GROQ_FAST_MODEL || "llama-3.1-8b-instant";
 
 function assertKey() {
   if (!process.env.GROQ_API_KEY) {
@@ -26,9 +29,10 @@ function assertKey() {
   }
 }
 
-// Auto-retry transient rate limits (Groq honours the Retry-After header), so a
-// brief per-minute spike recovers silently instead of surfacing an error.
-const MAX_RETRIES = 5;
+// Keep retries low (1) — on the free tier, a 429 retry storm just compounds
+// the problem. One gentle retry handles transient blips; anything worse should
+// surface to the user immediately.
+const MAX_RETRIES = 1;
 
 export function reasoningLLM(temperature = 0.2) {
   assertKey();

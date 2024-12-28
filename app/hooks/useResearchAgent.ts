@@ -93,6 +93,8 @@ function reduce(state: ResearchState, event: AgentEvent): ResearchState {
     case "error":
       return { ...state, phase: "error", error: event.message };
     case "done": {
+      // Don't clobber a terminal error / not-found state with "done".
+      if (state.phase === "error") return state;
       const steps = state.steps.map((s) => ({ ...s, status: "done" as StepStatus }));
       return { ...state, phase: "done", steps };
     }

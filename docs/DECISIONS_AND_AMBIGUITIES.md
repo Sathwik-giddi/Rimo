@@ -80,8 +80,8 @@
       changes. Clean **quality-vs-throughput** trade-off; documented.
 - [x] **Graceful rate-limit handling.** `humanizeError()` distinguishes per-minute (TPM → wait
       seconds) from per-day (TPD → resets ~24h) and renders a human message, never raw JSON.
-      `ChatGroq` uses `maxRetries: 5` so transient per-minute spikes recover silently. Evidence is
-      trimmed (top-3 sources/question, 320-char snippets) to stay within the free TPM.
+      `ChatGroq` uses `maxRetries: 1` so a transient per-minute spike gets one recovery attempt.
+      Evidence is trimmed (top source per question, 150-char snippets) to stay within the free TPM.
 - [x] **Under-the-hood shown in-product.** Added a collapsible "How Altair decided" panel so the
       result itself explains the pipeline, the weighted factors, the threshold rule, and the
       conviction cap — covering the brief's "what it researches / how it works / how it shows results"

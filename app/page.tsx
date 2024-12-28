@@ -228,8 +228,20 @@ export default function Home() {
       {state.phase === "error" &&
         (state.notFound ? (
           <div className="mx-auto mt-16 max-w-md rounded-xl border border-white/10 bg-white/[0.03] p-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 text-2xl">
-              🔍
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-zinc-400">
+              <svg
+                className="h-6 w-6"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={1.7}
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.4-3.4" />
+                <path d="M8.5 11h5" />
+              </svg>
             </div>
             <h3 className="text-lg font-semibold text-white">Company not found</h3>
             <p className="mt-2 text-sm leading-relaxed text-zinc-400">{state.error}</p>

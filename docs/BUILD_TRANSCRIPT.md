@@ -256,7 +256,7 @@ so we double down on web search as the universal backbone and instead make the a
 4. **Reflect-and-retry deepen loop** — after analysis, if the analyst rates `dataQuality: low` and we
    haven't deepened, a conditional LangGraph edge routes back through a `deepenStep` (broader queries)
    then re-analyzes. (Chosen over a source-count trigger because Tavily always returns padded results.)
-5. **Token trimming** (top-3 sources/question, 320-char snippets) to stay under Groq's 12k TPM free limit.
+5. **Token trimming** (top source per question, 150-char snippets) to stay under Groq's 12k TPM free limit.
 
 **Bugs/limits handled:** Groq 429 TPM rate-limit on rapid back-to-back runs → mitigated by trimming
 evidence tokens (single-user pacing is fine). Deepen trigger moved from raw source count → analyst's
@@ -268,7 +268,7 @@ deepen loop fired → PASS 45, low data, honestly "absence of evidence, not nega
 Same agent, honest across company sizes. `tsc` clean throughout.
 
 ### [Turn 19] Visual dashboard + dark premium redesign
-**U:** "too much text — use infographics/graphs/diagrams." Then shared a dark, warm-orange premium
+**U:** "too much text — use infographics, graphs, and diagrams." Then shared a dark, warm-orange premium
 agency aesthetic as inspiration and asked to remake the UI to that *feel* (not exact elements).
 **A:** Two passes:
 1. **Infographics (hand-built SVG, no chart lib):** `ConvictionGauge` (radial ring), `ScoreRadar`
@@ -351,7 +351,7 @@ per-org and only affects *our* test account today; graders' own keys get a fresh
   **per-minute** limit (TPM) — partly because a concurrent test run collided with the user's click in
   the same minute. Rewrote `humanizeError()` (API route) to distinguish per-minute (wait seconds) vs
   per-day (resets over 24h) and to render a clean message instead of raw JSON.
-- **Auto-retry:** added `maxRetries: 5` to `ChatGroq` so transient per-minute spikes recover silently
+- **Auto-retry:** added `maxRetries: 1` to `ChatGroq` so a transient per-minute spike gets one recovery
   (Groq honours Retry-After) instead of surfacing an error.
 - Also reduced tokens earlier by moving the *decide* narrative to 8B (the decision is computed in
   code, so 70B was wasteful) — roughly doubling runs-per-day. Verified live: full run → INVEST 77.
@@ -391,7 +391,7 @@ and added Turns 30–31 above so the transcript (a graded bonus) stays complete.
 **U:** requested making the UI accent color "a bit more red".
 **A:** Updated the theme accent color to a hotter blazing red-orange (`#df2514` / RGB `223, 37, 20`). Re-ran the custom Pillow image script to update `public/logo.png` and `app/icon.png` (favicon) to the new blazing red shade. Appended records to the decisions log and progress transcripts.
 
-### [Turn 33] Moved methodology → generic "How it works" in the top bar
+### [Turn 37] Moved methodology → generic "How it works" in the top bar
 **U:** "move 'how Altair decides' to the landing page top-right (replacing 'Equity Research
 Terminal'); make it a generic, easy-to-understand write-up of how it works."
 **A:** Replaced the run-specific result panel with a global explainer:
@@ -404,19 +404,19 @@ Terminal'); make it a generic, easy-to-understand write-up of how it works."
 - *Why:* a generic, beginner-friendly explainer reaches users *before* they run anything and keeps
   the result view focused on the verdict. `tsc` clean.
 
-### [Turn 34] Wider "How it works" dialog + minimal scrollbar
+### [Turn 38] Wider "How it works" dialog + minimal scrollbar
 **U:** "increase the dialog width and use a minimal scroller that matches the UI."
 **A:** Widened the modal (`max-w-lg` → `max-w-2xl`, padding `p-8`) and added a global minimal dark
 scrollbar in `globals.css` (`scrollbar-width: thin`, translucent-white thumb, transparent track,
 webkit + Firefox) so the whole app and the modal scroll consistently on-theme. `tsc` clean.
 
-### [Turn 35] Fixed broken "trust" bullets in the modal
+### [Turn 39] Fixed broken "trust" bullets in the modal
 **U:** showed the "Why you can trust it" bullets rendering as broken fragments.
 **A:** Root cause: each `<li>` was `display:flex`, so bare text nodes + inline highlight `<span>`s
 each became *separate flex items* with gaps (e.g. "It / stays / honest"). Fix: wrapped each bullet's
 text in a single `<span>` so it's one flex item that flows as normal inline text. `tsc` clean.
 
-### [Turn 36] Modal scroll padding & ultra-thin custom scrollbar
+### [Turn 40] Modal scroll padding & ultra-thin custom scrollbar
 **U:** requested managing the "How it works" dialog box so that there is no loss of top padding when scrolling, and using an ultra-minimal scrollbar matching the UI.
 **A:** Redesigned the `HowItWorks` modal layout to keep the header and footer pinned at the top and bottom of the panel while the body content scrolls independently. Added a `.custom-scrollbar` class in `globals.css` with a 4px wide thumb, preventing elements from touching the top borders during scroll and keeping the overlay cleanly padded.
 
@@ -433,7 +433,7 @@ text in a single `<span>` so it's one flex item that flows as normal inline text
 **A:** Reduced the vertical footprint of the modal header by shrinking the title font size to `text-lg` (from `text-xl`), shifting the subtitle to `text-xs text-zinc-500` (from `text-sm`), and tightening the bottom padding to `pb-3` (from `pb-4`).
 
 ### [Turn 40] Premium Dashboard Layout Reorganization
-**U:** "in the final report page........put these sections in a better manner change their positions........do something different"
+**U:** "in the final report page, put these sections in a better manner — change their positions, do something different"
 **A:** Moved `VerdictCard` to the top spanning the full width of the screen, providing ample space for the thesis and side-by-side Bull/Bear case panels. Put `Dimensions` (Category Breakdown) in a wide left column (`1fr`) and the supporting research trace (`AgentTrace` + `Sources`) in a right sidebar (`320px`), balancing final results with live updates.
 
 ### [Turn 41] Bi-Directional Hover Infographic Interactivity
@@ -486,7 +486,7 @@ decisions doc; noted a future "borderline" label for genuine coin-flip companies
 **A:** Configured Framer Motion's `<AnimatePresence mode="wait">` wrapper in `app/page.tsx` to orchestrate transitions between layout states. When the research verdict resolves, the centered timeline smoothly crossfades (fades out and slides up) before the complete executive dashboard dashboard fades in and rises, eliminating all layout snaps.
 
 ### [Turn 51] Waterfall Progress Path Timeline
-**U:** "now I got an idea that when showing that whole agent trace thingy......lets make it more interactive........lets make it look like a waterfall......one step leadss to another in an animated manner"
+**U:** "I got an idea — when showing the agent trace, let's make it more interactive, like a waterfall where one step leads to another in an animated manner"
 **A:** Designed a flowing waterfall timeline: added a track container with a glowing progress line (`bg-accent` + shadow glow) that dynamically "flows" down the timeline based on active and completed nodes. Configured branch line borders to glow softly during sub-query execution to indicate the flow of active research.
 
 ### [Turn 52] Staggered Slab Staircase/Waterfall Layout
@@ -494,11 +494,11 @@ decisions doc; noted a future "borderline" label for genuine coin-flip companies
 **A:** Redesigned `AgentTrace` to display a Gantt-style diagonal stair-step waterfall layout. Replaced the vertical progress bar with a horizontal tracker line at the top, followed by a series of glowing rounded cards ("slabs") for each pipeline step. Slabs cascade diagonally (planning starting left, researching indented 16%, analyzing 32%, and verdict 48% on desktop) with responsive styling for smaller viewports.
 
 ### [Turn 53] Multi-Variant Agent Trace Layouts
-**U:** "naah not for the agent trace we have in report"
+**U:** "no, not for the agent trace we have in the report"
 **A:** Refactored `AgentTrace` to support dual layout variations: `variant="staircase"` and `variant="vertical"`. Kept the wide diagonal staircase waterfall view strictly for the full-width loading screen, and reverted the final report's sidebar component to the clean, space-saving vertical timeline tracker layout to fit perfectly within the 320px column.
 
 ### [Turn 54] Transition Buffer Delay (Delightful Progress Pause)
-**U:** requested slowing down the transition to the final report so users have time to see the completed trace fully resolved instead of snapping instantly to the finished report.
+**U:** requested slowing down the transition to the final report so users have time to see the completed trace fully resolved, instead of snapping instantly to the finished report.
 **A:** Introduced a `showReport` transition hook with a 2-second visual delay buffer in `app/page.tsx`. When the research finishes and `state.verdict` is populated, the full staircase timeline displays completed at 100% with a compilation message at the bottom (`✓ Research complete. Compiling final dashboard...`) for exactly 2 seconds before fading out and smoothly crossfading into the final executive report.
 
 ### [Turn 55] Crimson Red Theme Adjustments
@@ -518,15 +518,15 @@ decisions doc; noted a future "borderline" label for genuine coin-flip companies
 **A:** Corrected the vertical segment structural CSS. Previously, the segment track containers were nested inside the status dot wrapper, whose height was constricted by its content. Lifted the segment absolute tracks out of the dot wrapper and directly into the parent relative `li` container. Now `bottom-0` anchors exactly to the `li` bottom boundary, enabling the progress line segments to perfectly stretch and bridge the exact gap to the next dot without coming up short.
 
 ### [Turn 59] Central Vertical Waterfall Layout (Total Revamp)
-**U:** "naah I dont like this UI at all.....do something different" (referring to the horizontal staircase design in the loading state)
+**U:** "I don't like this UI at all — do something different" (referring to the horizontal staircase design in the loading state)
 **A:** Scrapped the horizontal block layout for the loading state entirely. Built a majestic **Central Vertical Waterfall** layout (`variant="waterfall"`). Instead of spreading across columns, the loading trace is now centered in a wide `max-w-3xl` container. Steps animate downwards as large, premium glassmorphic slabs (`text-lg`). Crucially, when the agent enters the "Research" phase, the spawned search queries dynamically cascade vertically downwards out of the research block, using Framer Motion's `layout` properties to smoothly push the content below them out of the way. This perfectly matches the app's minimalist monochrome-and-crimson aesthetic.
 
 ### [Turn 60] Compressed Waterfall Spacing
-**U:** "see its a loading animation I wan to see all in the same screen withpout scroll........so fix it"
+**U:** "it's a loading animation — I want to see all steps on the same screen without scrolling, so fix it"
 **A:** Compressed the overall vertical footprint of the new Central Waterfall layout. Reduced the global top/bottom padding (`py-12` -> `py-4`), shrunk the glassmorphic slab inner paddings, reduced the gaps between steps, and scaled down the typography of the search queries to `text-xs`. This ensures the entire 4-step sequence and its dynamic cascading queries fit comfortably within a standard viewport height without pushing content below the fold.
 
 ### [Turn 61] Pipeline Logic and Autoscroll
-**U:** "why we have so much of gap on top......also you see the inconsistency...one pipeline not completed and second started.......fix it........also if all the pipeline can not appear in the same page then autoscroll as the animation goes"
+**U:** "why is there so much gap on top? Also the pipeline is inconsistent — one step hasn't completed and the next started. Fix it. Also if all pipeline steps can't appear on the same page then auto-scroll as the animation goes"
 **A:** Fixed three key layout issues simultaneously:
 1.  **Removed Top Gap:** Removed the heavy padding above the trace (`py-10` in `page.tsx` reduced to `pt-2 pb-10`), moving the UI closer to the top navigation for better space utilization.
 2.  **Fixed Pipeline Leakage:** Adjusted the vertical red tracking lines. Previously, they grew to 50% height while a step was executing. Now, they strictly remain at `0%` until their parent step is completely `done`, ensuring the progress line accurately reflects task completion and doesn't prematurely drop into unstarted territory.
@@ -537,18 +537,18 @@ decisions doc; noted a future "borderline" label for genuine coin-flip companies
 **A:** Added a `useEffect` hook in `page.tsx` that observes the `showReport` state. When the trace animation completes and `showReport` toggles to true, the browser instantly triggers `window.scrollTo({ top: 0, behavior: "smooth" })`, ensuring the user is positioned perfectly at the top of the final dashboard rather than stranded at the bottom from the previous waterfall auto-scroll.
 
 ### [Turn 63] Smoothed Waterfall Animations
-**U:** "keep the animation more smooth.....it just feels like its too quick"
+**U:** "keep the animation smoother — it feels too quick"
 **A:** Softened and slowed down the Framer Motion physics throughout the waterfall loader:
 1. Increased the `delay` stagger for the step slabs (from `0.15s` to `0.2s`) and reduced the spring `stiffness` (from `100` to `60`) with higher `damping` (`15`). This prevents the blocks from popping in abruptly and gives them a slow, premium slide.
 2. Increased the `duration` of the red vertical progress line from `0.8s` to `1.2s`, making it feel like a smooth, slow-drawing laser connecting the steps.
 3. Added softer `easeInOut` transitions (`0.5s`) for the height expansion of the search block, and applied gentler spring physics (`stiffness: 70, damping: 15`) to the cascading layout animations of the individual search queries as they slide downwards.
 
 ### [Turn 64] Debounced Autoscroll
-**U:** "that auto vertical scrolll thingy.....it just jumps...keep it smooth"
+**U:** "the auto vertical scroll jumps — keep it smooth"
 **A:** Fixed the stuttering autoscroll caused by rapid state updates (e.g., when 6 searches fire at once, triggering 6 immediate smooth-scrolls that fight each other). Implemented a debounce (`setTimeout` of `200ms`) inside the `useEffect` hook in `AgentTrace.tsx`. This slight delay allows the rapid Framer Motion height changes to coalesce and begin animating before triggering a single, clean `window.scrollTo`, resulting in a perfectly fluid scrolling glide.
 
 ### [Turn 65] Minimal Horizontal Pipeline Loader
-**U:** "okay leave it.......keep a horizontal pipeline with no expanaded text for nonee.......just a simple loading for the final report"
+**U:** "leave it — keep a horizontal pipeline with no expanded text for any step, just a simple loading for the final report"
 **A:** Scrapped the vertical waterfall UI entirely. Implemented a minimalist `horizontal` variant in `AgentTrace.tsx`. This new layout arranges the 4 tracking dots in a clean horizontal flex-row, completely hides the expanding search queries and step details, and connects the dots with horizontal `w-full` progress lines. Removed the autoscroll logic since the horizontal loader is fully static and never expands out of bounds. Switched `page.tsx` to mount `<AgentTrace variant="horizontal" />`.
 
 ### [Turn 66] Horizontal Pipeline Spacing
@@ -556,15 +556,15 @@ decisions doc; noted a future "borderline" label for genuine coin-flip companies
 **A:** Increased the vertical breathing room around the new horizontal pipeline loader. Pushed the entire component section down by changing top padding from `pt-8` to `pt-16` and bottom padding from `pb-4` to `pb-12`. Additionally, doubled the margin gap between the tracking dots and their step labels below them (from `mt-4` to `mt-8`) so the text doesn't feel cramped against the progress bar.
 
 ### [Turn 67] Fixed Horizontal Pipeline Overhang
-**U:** "why do we have line bbefore and after first and last nodes??"
+**U:** "why do we have a line before and after the first and last nodes?"
 **A:** Fixed the overhanging gray background lines. Previously, a single absolute `bg-white/10` track spanned the entire width of the container, causing it to poke out past the first and last step dots (since `flex-1` adds padding around them). Removed the global line and instead rendered the `bg-white/10` track specifically inside the connecting segments between the dots, ensuring the inactive gray line exactly matches the geometry of the active red line without overhanging.
 
 ### [Turn 68] Minimalist Loader Cleanup
-**U:** "look at the page ....I dont like way agent  trace is writeen and why the pieline is so close to it.....also research complete.....I dont like that as well"
+**U:** "look at the page — I don't like the way 'agent trace' is written, and why is the pipeline so close to it? Also 'research complete' — I don't like that either"
 **A:** Stripped away all redundant text from the loading phase to achieve absolute minimalism. Removed the "AGENT TRACE" `h3` heading from `AgentTrace.tsx` completely, allowing the horizontal pipeline to stand alone beautifully in the center of the screen. Also removed the flashing red "RESEARCH COMPLETE. COMPILING FINAL DASHBOARD..." text from `page.tsx`. Now, when the pipeline hits 100%, it simply rests on the final red dot for 2 seconds before seamlessly transitioning to the final report, with no unnecessary flashing text.
 
 ### [Turn 69] Centered Loader with Telemetry Header
-**U:** "keep agent trace...but write it in a better manner......also that pieline thingy keep it in the middle of screen"
+**U:** "keep 'Agent Trace' but write it in a better manner — also that pipeline, keep it in the middle of the screen"
 **A:** Completely transformed the loading screen presentation. Vertically centered the entire loading module in `page.tsx` by setting the container to `min-h-[60vh]` with `justify-center`. Brought back the "Agent Trace" header in `AgentTrace.tsx`, but upgraded it to a premium layout: it now features a glowing, pulsing "Live Telemetry" crimson badge, and elegant, wide-tracked typography flanked by subtle lines.
 
 ---
@@ -696,12 +696,37 @@ include it; rotate keys before submitting.
 **A:** Drove the Vercel deploy after the user did the one-time `vercel login`. Linked the project
 under team scope `codexs-projects-74a35d9b/investment-research-agent` (Hobby). Set the three
 production env vars from `.env.local` **piped via stdin so the key values never appeared in any
-command** (`GROQ_API_KEY`, `TAVILY_API_KEY`, `GROQ_REASONING_MODEL=llama-3.1-8b-instant`); confirmed
+command** (`GROQ_API_KEY`, `TAVILY_API_KEY`); confirmed
 encrypted in Production. `vercel --prod` built remotely (31s) and deployed READY. Live + verified
 (HTTP 200, renders "Altair"): **https://investment-research-agent-virid.vercel.app** — added to the
 README's Live demo line.
 **⚠️ Sequencing note for submission:** the deployed env vars hold the *current* keys. If keys are
 rotated for transcript safety, the **Vercel env vars must be updated with the new keys + redeploy**,
 or the live demo breaks.
+
+### [Turn 81] Screenshots folder + pushed to GitHub
+**U:** "all screenshots in a screenshot folder" → then "let's put this on GitHub: git@github.com:Komalpreet2809/Altair.git"
+**A:** Created `screenshots/` (with a naming guide) and wired the README's Example Runs section to
+embed `screenshots/{landing,trace,nvidia,zomato,boult-audio,zentary}.png`. For GitHub: scanned every
+committable file for real keys (clean — only placeholder text), confirmed `.env.local`/`.vercel`/
+`node_modules` are gitignored, **moved `docs/` into the app folder** (self-contained repo; fixed README
+links from `../docs` → `docs`), added a `!.env.example` exception so the env template is tracked,
+committed (37 files, verified no secrets staged), renamed branch `master`→`main`, and pushed to the
+existing **private** repo via the SSH remote → **https://github.com/Komalpreet2809/Altair** ✓.
+Note: `docs/` now lives at `investment-research-agent/docs/` — future doc edits go there.
+
+### [Turn 82] Fixed per-minute rate limit on obscure-company (deepen) runs
+**U:** "Zentary always gives a per-minute rate-limit error — and even InsideIIM does now. If it
+reappears after the wait, that's a bug."
+**A:** User was right that it behaved like a bug. **Probed the real Groq limits**: 8B = **6,000 TPM**,
+70B = **12,000 TPM**. Root cause: the `GROQ_REASONING_MODEL=8b` override crammed *every* call
+(plan/analyze/re-analyze/decide) onto the small 6k bucket; an obscure-company run triggers the deepen
+loop → **analyze runs twice** → a single run exceeded 6k TPM, so it failed regardless of waiting (a
+real bug, self-inflicted by the override). Fix: (1) removed the 8B override → analyze on **70B (12k
+TPM)**, which also **splits load across two buckets** (plan/decide on 8B's 6k, analyze on 70B's 12k);
+(2) trimmed evidence (total-source cap 14, 240-char snippets, deepen 5→3 queries). Verified locally:
+Zentary completed the full deepen loop → PASS 45, no rate-limit. Committed + pushed the code fix;
+removed `GROQ_REASONING_MODEL` from Vercel and **redeployed** (live HTTP 200). Live demo now handles
+obscure companies.
 
 *(appended live as code is written, tested, and deployed)*

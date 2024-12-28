@@ -48,8 +48,8 @@ function emitter(config: LangGraphRunnableConfig) {
 // We cap sources-per-question and truncate each snippet: Tavily snippets are short
 // already, and trimming keeps us well under Groq's free-tier token-per-minute limit
 // while still giving the analyst enough signal.
-const MAX_SOURCES_PER_Q = 2;
-const MAX_SNIPPET_CHARS = 240;
+const MAX_SOURCES_PER_Q = 1;
+const MAX_SNIPPET_CHARS = 150;
 // Hard cap on total sources fed to the analyst. The deepen loop re-analyzes with
 // BOTH passes of evidence, so without a global cap an obscure-company run can spike
 // past Groq's per-minute token limit. We still list every question (so the model
@@ -107,9 +107,7 @@ async function planNode(state: AgentStateType, config: LangGraphRunnableConfig) 
 
   // temperature 0 → reproducible questions → stable evidence → stable verdict
   const llm = fastLLM(0).withStructuredOutput(ResearchPlanSchema, {
-    name: "research_plan",
-    method: "jsonMode",
-  });
+    name: "research_plan", method: "jsonMode",  });
   const plan = await llm.invoke([
     { role: "system", content: `${PLAN_SYSTEM}\n\n${jsonSchemaHint(ResearchPlanSchema, "research_plan")}` },
     { role: "user", content: `Company: ${state.company}` },
@@ -211,9 +209,7 @@ async function analyzeNode(state: AgentStateType, config: LangGraphRunnableConfi
   // temperature 0 so the same evidence yields the same scores → a stable, reproducible
   // verdict (no more "same score, different decision" across repeat runs).
   const llm = reasoningLLM(0).withStructuredOutput(AnalysisSchema, {
-    name: "analysis",
-    method: "jsonMode",
-  });
+    name: "analysis", method: "jsonMode",  });
   const raw = await llm.invoke([
     { role: "system", content: `${ANALYZE_SYSTEM}\n\n${jsonSchemaHint(AnalysisSchema, "analysis")}` },
     {
@@ -275,9 +271,7 @@ async function decideNode(state: AgentStateType, config: LangGraphRunnableConfig
   // already decided in code, so the fast model is enough here — saving the heavier
   // model's limited daily quota for the analysis step that actually needs reasoning.
   const llm = fastLLM(0.3).withStructuredOutput(VerdictNarrativeSchema, {
-    name: "verdict_narrative",
-    method: "jsonMode",
-  });
+    name: "verdict_narrative", method: "jsonMode",  });
   const narrative = await llm.invoke([
     { role: "system", content: `${DECIDE_SYSTEM}\n\n${jsonSchemaHint(VerdictNarrativeSchema, "verdict_narrative")}` },
     {
