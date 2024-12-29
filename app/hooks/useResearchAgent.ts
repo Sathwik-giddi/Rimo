@@ -59,7 +59,7 @@ function reduce(state: ResearchState, event: AgentEvent): ResearchState {
     case "node-start": {
       const steps = state.steps.map((s) =>
         s.node === event.node
-          ? { ...s, status: "active" as StepStatus, label: event.label }
+          ? { ...s, label: event.label, status: s.status === "done" ? "done" : "active" as StepStatus }
           : s
       );
       return { ...state, steps };

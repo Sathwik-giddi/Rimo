@@ -114,7 +114,7 @@ The 6 factors and their weights live in **code** (`lib/agent/framework.ts`), not
 
 1. The LLM **scores** each factor from the evidence.
 2. A **weighted average** → a single composite (0–10).
-3. **Threshold rule:** `≥ 6.5 → INVEST · ≥ 4.5 → HOLD · else PASS`.
+3. **Threshold rule:** `≥ 7.0 → INVEST · ≥ 5.5 → HOLD · else PASS`.
 4. **Conviction** is sized by how decisive the score is, then **hard‑capped by data quality** (`low → 45, medium → 72, high → 95`) — so the agent is never falsely confident about a company it could barely research.
 
 This means the actual call is explainable math; the LLM only handles language and scoring.

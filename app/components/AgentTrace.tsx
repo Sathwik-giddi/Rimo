@@ -191,7 +191,7 @@ export function AgentTrace({
       <div className="w-full max-w-4xl flex flex-col items-center">
         {/* Elegant glowing telemetry heading */}
         <div className="flex flex-col items-center justify-center mb-16">
-          <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-full bg-accent/10 border border-accent/20 mb-3 shadow-[0_0_15px_-3px_rgba(196,26,13,0.2)]">
+          <div className="inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg bg-accent/10 border border-accent/20 mb-3 shadow-[0_0_15px_-3px_rgba(196,26,13,0.2)]">
             <span className="h-1.5 w-1.5 rounded-full bg-accent animate-pulse shadow-[0_0_5px_rgba(196,26,13,0.8)]" />
             <span className="text-[10px] font-mono tracking-widest uppercase text-accent">Live Telemetry</span>
           </div>

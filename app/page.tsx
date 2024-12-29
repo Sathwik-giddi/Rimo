@@ -113,9 +113,13 @@ export default function Home() {
                 setCompany("");
                 setShowReport(false);
               }}
-              className="text-xs font-medium bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white px-4 py-1.5 rounded border border-white/10 cursor-pointer transition-colors"
+              className="flex items-center justify-center bg-white/5 hover:bg-white/10 text-zinc-300 hover:text-white p-2 rounded border border-white/10 cursor-pointer transition-colors"
+              title="New Search"
             >
-              New Search
+              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="7" />
+                <path d="m20 20-3.4-3.4" />
+              </svg>
             </button>
           )}
         </div>
@@ -227,34 +231,51 @@ export default function Home() {
       {/* Error / not-found */}
       {state.phase === "error" &&
         (state.notFound ? (
-          <div className="mx-auto mt-16 max-w-md rounded-xl border border-white/10 bg-white/[0.03] p-8 text-center">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.02] text-zinc-400">
-              <svg
-                className="h-6 w-6"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.7}
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35 }}
+            className="mx-auto mt-16 max-w-md text-center"
+          >
+            {/* Icon */}
+            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-zinc-500">
+              <svg className="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="7" />
                 <path d="m20 20-3.4-3.4" />
                 <path d="M8.5 11h5" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-white">Company not found</h3>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-400">{state.error}</p>
+
+            <h3 className="text-xl font-semibold text-white">No company found</h3>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-500">{state.error}</p>
+
+            {/* Divider */}
+            <div className="my-6 border-t border-white/[0.06]" />
+
+            {/* Suggestions */}
+            <p className="mb-3 text-xs font-medium uppercase tracking-widest text-zinc-600">Try one of these</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {EXAMPLES.map((ex) => (
+                <button
+                  key={ex}
+                  onClick={() => {
+                    reset();
+                    setCompany(ex);
+                  }}
+                  className="rounded-lg border border-white/10 bg-white/[0.04] px-4 py-1.5 text-sm text-zinc-300 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white cursor-pointer"
+                >
+                  {ex}
+                </button>
+              ))}
+            </div>
+
             <button
-              onClick={() => {
-                reset();
-                setCompany("");
-              }}
+              onClick={() => { reset(); setCompany(""); }}
               className="btn-accent mt-6 rounded-lg px-5 py-2 text-sm font-medium text-white cursor-pointer"
             >
-              Try another company
+              New search
             </button>
-          </div>
+          </motion.div>
         ) : (
           <div className="mx-auto mt-8 max-w-xl rounded-xl border border-white/15 bg-white/[0.04] px-4 py-3 text-sm text-zinc-300">
             <span className="font-medium text-white">Something went wrong.</span> {state.error}

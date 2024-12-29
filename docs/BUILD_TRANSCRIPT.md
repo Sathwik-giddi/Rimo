@@ -730,3 +730,90 @@ removed `GROQ_REASONING_MODEL` from Vercel and **redeployed** (live HTTP 200). L
 obscure companies.
 
 *(appended live as code is written, tested, and deployed)*
+
+---
+
+## Session 3 — Post-Submission QA & Polish (30 June 2026)
+
+### [Turn 83] Started local dev server
+**U:** "run local host"
+**A:** Identified Next.js project, launched `npm run dev` in a new PowerShell window. Server started on
+`http://localhost:3000`.
+
+### [Turn 84] Company suggestions + expected results
+**U:** "suggest me some companies and also lemme know what result to expect so that we can match the performance"
+**A:** Explained the scoring system (≥7.0 INVEST, ≥4.5 HOLD, <4.5 PASS at this point) and suggested:
+- **INVEST:** Nvidia, Microsoft, Apple
+- **HOLD:** Zomato, Paytm, Ola Electric
+- **PASS:** WeWork, Byju's
+- **Wild card (data quality cap):** Zepto
+
+### [Turn 85] Results reviewed — WeWork & Byju's showed HOLD not PASS
+**U:** Shared screenshots. WeWork = HOLD 53/100 (5.2 score), Byju's = HOLD 56/100 (5.0 score), Zepto = HOLD 52/100 (5.7 score).
+**A:** Post-mortem: both scored just above the 4.5 HOLD threshold because the model was correctly
+identifying real positives (WeWork's brand/revenue, Byju's proprietary content/TAM) alongside the
+negatives. Getting PASS required scoring below 4.5 — hard when a company has any redeeming assets.
+Zepto HOLD was a correct prediction.
+
+### [Turn 86] Scoring calibration fix
+**U:** Confirmed Nvidia/Microsoft/Apple showed INVEST as expected but the three PASS candidates didn't.
+**A:** Investigated `lib/agent/framework.ts` and `lib/agent/graph.ts`. Root causes:
+1. **HOLD threshold (4.5) was below the neutral midpoint (5.5)** — the conviction formula uses 5.5 as
+   neutral (`Math.abs(composite - 5.5)`), so scores 4.5–5.5 were classified HOLD despite being net-negative.
+2. **Prompt allowed compensation** — the hard rule mandated 0-2 on Financial Health for bankrupt
+   companies but didn't prevent high Competitive Moat / Industry scores from pulling the average above 4.5.
+
+**Fixes applied:**
+- `framework.ts:98` — raised HOLD threshold from `4.5` → `5.5` (symmetric with the neutral midpoint).
+- `graph.ts` — added hard rule: companies in active bankruptcy/insolvency MUST score 0-2 on BOTH
+  Financial Health AND Business Fundamentals; brand/moat cannot compensate.
+
+Deployed to production. WeWork (5.2) and Byju's (5.0) now correctly show **PASS**; Zepto (5.7) correctly
+stays **HOLD**; INVEST companies unaffected (all score ≥ 7.0).
+
+### [Turn 87] More company suggestions
+**U:** "some more companies to try"
+**A:** Suggested:
+- INVEST: Reliance Industries, Infosys, Zerodha
+- HOLD: Paytm, Ola Cabs, Swiggy, Snapchat
+- PASS: FTX, Theranos, Vodafone India (Vi)
+- Wild cards: OpenAI, SpaceX, Jio
+
+### [Turn 88] "Company not found" UI improvement
+**U:** Shared screenshot of the not-found state — wanted it improved.
+**A:** Redesigned the not-found state in `app/page.tsx`:
+- Added `motion.div` fade-in + slide-up animation (framer-motion)
+- Replaced card box with breathing open layout
+- Larger `rounded-2xl` icon block
+- Added "TRY ONE OF THESE" section with quick-tap example chips (using existing `EXAMPLES` array)
+- Clicking a chip pre-fills and resets in one tap
+- Renamed button from "Try another company" → "New search"
+
+### [Turn 89] New Search button → icon only
+**U:** Shared screenshot of top-right "New Search" text button — wanted icon instead.
+**A:** Replaced text with SVG search icon in `app/page.tsx:116`. Same border/bg/hover styles, `p-2`
+square padding, `title="New Search"` tooltip.
+
+### [Turn 90] Rounded corners consistency fix
+**U:** Shared screenshot — company suggestion chips were `rounded-full` (pill), rest of UI uses `rounded-lg`.
+**A:** Changed example chips from `rounded-full` → `rounded-lg` in `app/page.tsx:265`.
+
+### [Turn 91] LIVE TELEMETRY badge also pill-shaped
+**U:** "live telemetry also round........be cohesive throughout the UI"
+**A:** Changed `AgentTrace.tsx:194` — LIVE TELEMETRY badge from `rounded-full` → `rounded-lg`.
+
+### [Turn 92] Cooldown animation bug
+**U:** "when that cooldown appears that loading pipeline animation moves back and forth — looks broken"
+**A:** Diagnosed the root cause: the deepen pass emits `node-start` for the `research` node again
+after it was already `done`. The reducer set it back to `active`, reversing the connecting-line
+animation from 100% → 0%.
+
+**Fix:** `app/hooks/useResearchAgent.ts` reducer `node-start` case — added guard so a step that's
+already `done` keeps its `done` status; label still updates (informational) but status never regresses.
+Before: `status: "active"` always. After: `status: s.status === "done" ? "done" : "active"`.
+Pipeline now only ever moves forward.
+
+### [Turn 93] Production deployments
+All session-3 changes deployed to **https://investment-research-agent-virid.vercel.app** via
+`vercel --prod` (Vercel CLI 54.18.5). Two deploys: first after the scoring + UI fixes (33s build),
+second after the animation + consistency fixes.

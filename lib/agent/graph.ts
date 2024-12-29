@@ -228,6 +228,10 @@ Hard rules:
 - Weigh NEGATIVE evidence as heavily as positive. A company that is losing money, burning cash, in or
   near bankruptcy, or mired in scandal MUST score 0-2 on Financial Health (and on Management &
   Governance for fraud/governance failures) — regardless of brand, hype, or past glory.
+- If a company has filed for bankruptcy, is in active insolvency/liquidation proceedings, or has
+  effectively ceased operations, it MUST score 0-2 on BOTH Financial Health AND Business Fundamentals.
+  Brand recognition, historical revenue, or market presence do NOT offset a non-operating or insolvent
+  entity — score those factors in the 0-2 range and do not let positive macro/moat scores compensate.
 - Do NOT default to a comfortable middle. If the evidence is thin OR mostly negative, score LOW and
   say so. Never reward a company just for being well-known.
 - Reserve 8-10 for companies with clearly demonstrated, evidenced strength.
