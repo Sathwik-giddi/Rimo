@@ -4,11 +4,11 @@
 > scores it on a fixed 6‑factor framework, and returns a clear **Invest / Hold / Pass** verdict
 > with its reasoning, a confidence level, and **every source cited**.
 
-Built for the **InsideIIM × AltUni AI Labs** — AI Product Development Engineer (Intern) take‑home.
-
 **Stack:** Next.js (App Router) · React · TypeScript · **LangGraph.js** · Groq (Llama) · Tavily · Tailwind
 
 🔗 **Live demo:** **https://investment-research-agent-virid.vercel.app**
+
+🐙 **GitHub repo:** **https://github.com/Komalpreet2809/Altair**
 
 > ⚠️ **Note on the live demo (free tier):** This runs on Groq's **free tier**, which has a daily token limit (~100k tokens/day, roughly ~30 analyses). If you see a *"rate limit / daily limit reached"* message, that cap was simply hit — it **resets automatically** (wait a little and retry), or run locally with your own free key (see [§2 How to run it](#2-how-to-run-it)). This is a hosting quota, not a bug — the agent logic is unaffected.
 
@@ -205,18 +205,8 @@ Impressive revenue growth and a clear product niche, but limited public data on 
 
 ---
 
-## 7. BONUS — build transcript & LLM session logs
-
-This project was built in a pair‑programming session with an LLM (Claude, via Claude Code), used as a reasoning aid — and **every decision is one the author can explain and defend.** The complete, running session log lives in:
-
-- **[`docs/BUILD_TRANSCRIPT.md`](docs/BUILD_TRANSCRIPT.md)** — the full turn‑by‑turn build transcript (framing → company research → architecture → build → bug fixes → polish).
-- **[`docs/DECISIONS_AND_AMBIGUITIES.md`](docs/DECISIONS_AND_AMBIGUITIES.md)** — every key decision, trade‑off, and ambiguity call with its reasoning.
-- **[`docs/PRODUCT_PRINCIPLES.md`](docs/PRODUCT_PRINCIPLES.md)** — the InsideIIM/Ayana product principles the design follows.
-
----
-
 ## Tech stack
 
 **Next.js** (App Router) · **React** · **TypeScript** · **LangGraph.js** + **LangChain core** · **Groq** (`ChatGroq`, Llama 3.3 70B / 3.1 8B) · **Tavily** (web search) · **Zod** (structured output) · **Tailwind CSS** · **Framer Motion** · hand‑built **SVG** charts.
 
-> Built solo for the InsideIIM × AltUni AI Labs assignment. Remember to **rotate your API keys** before sharing the repo publicly.
+> Remember to **rotate your API keys** before sharing the repo publicly.
