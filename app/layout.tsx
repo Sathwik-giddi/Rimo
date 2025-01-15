@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Altair — AI Investment Research Agent",
+  title: "Rimo — AI Investment Research Agent",
   description:
     "Type a company name. The agent researches the live web and decides Invest, Hold, or Pass — with its reasoning and sources.",
 };

@@ -31,7 +31,7 @@ export default function Home() {
     // The browser uses document.title as the default file name for "Save to PDF"
     const originalTitle = document.title;
     const safeCompany = state.company ? state.company.replace(/[^a-zA-Z0-9]/g, '_') : 'Company';
-    document.title = `Altair_Research_${safeCompany}`;
+    document.title = `Rimo_Research_${safeCompany}`;
 
     // A small delay to ensure any UI states settle before printing
     setTimeout(() => {
@@ -89,8 +89,8 @@ export default function Home() {
           }}
           className="flex items-center gap-4.5 cursor-pointer group border-none bg-transparent p-0 text-left outline-none"
         >
-          <img src="/logo.png" alt="Altair Logo" className="h-14 w-14 object-contain transition-transform group-hover:scale-105" />
-          <span className="text-2xl font-bold tracking-tight text-white transition-colors group-hover:text-accent">Altair</span>
+          <img src="/logo.png" alt="Rimo Logo" className="h-14 w-14 object-contain transition-transform group-hover:scale-105" />
+          <span className="text-2xl font-bold tracking-tight text-white transition-colors group-hover:text-accent">Rimo</span>
         </button>
         <div className="flex items-center gap-4">
           <HowItWorks />
@@ -142,7 +142,7 @@ export default function Home() {
               </span>
             </h1>
             <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-zinc-400">
-              Name any company — public giant or unknown startup. Altair researches the live
+              Name any company — public giant or unknown startup. Rimo researches the live
               web, scores it on six factors, and decides{" "}
               <span className="font-medium text-zinc-200">Invest</span>,{" "}
               <span className="font-medium text-zinc-200">Hold</span>, or{" "}

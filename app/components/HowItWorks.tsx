@@ -7,7 +7,7 @@ import { CATEGORIES } from "@/lib/agent/framework";
 /**
  * A self-contained "How it works" button + modal for the top bar. Plain-English,
  * generic explanation of the agent — always available (landing page or results),
- * so anyone can understand what Altair does and why to trust it before running it.
+ * so anyone can understand what Rimo does and why to trust it before running it.
  */
 
 const STEPS = [
@@ -61,7 +61,7 @@ export function HowItWorks() {
               {/* Pinned Header */}
               <div className="flex items-start justify-between pb-3 border-b border-white/5 flex-none">
                 <div>
-                  <h2 className="text-lg font-semibold text-white">How Altair works</h2>
+                  <h2 className="text-lg font-semibold text-white">How Rimo works</h2>
                   <p className="mt-0.5 text-xs text-zinc-500">
                     It researches a company the way an analyst would — then makes a call, and shows
                     its work.

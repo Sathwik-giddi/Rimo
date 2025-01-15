@@ -18,8 +18,8 @@ export function PrintReport({ state }: { state: ResearchState }) {
       <div className="flex items-end justify-between border-b-4 border-gray-900 pb-6 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-3">
-             <img src="/logo.png" alt="Altair Logo" className="h-10 w-10 object-contain" />
-             <span className="text-xl font-bold tracking-[0.2em] text-gray-900 uppercase">Altair</span>
+             <img src="/logo.png" alt="Rimo Logo" className="h-10 w-10 object-contain" />
+             <span className="text-xl font-bold tracking-[0.2em] text-gray-900 uppercase">Rimo</span>
           </div>
           <h1 className="text-5xl font-black text-gray-900 tracking-tight">{company}</h1>
           <p className="text-lg text-gray-500 font-medium mt-1">Deep-Dive Investment Analysis</p>

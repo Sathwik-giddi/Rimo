@@ -7,7 +7,7 @@
 [![Tavily](https://img.shields.io/badge/Tavily-Web%20Search-0B3D91)](https://tavily.com)
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
-> **Rimo** (formerly *Altair*) is an autonomous research agent that analyzes **any** company — from a
+> **Rimo** is an autonomous research agent that analyzes **any** company — from a
 > public giant to an unknown startup — against the live web, scores it on a fixed six-factor
 > framework, and delivers a clear **Invest / Hold / Pass** verdict with full reasoning, a
 > confidence level, and every source cited.
