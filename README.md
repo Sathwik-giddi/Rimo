@@ -174,26 +174,6 @@ repo/
 
 ---
 
-## Example Outputs
-
-> Screenshots live in [`screenshots/`](screenshots). Live web data means exact numbers vary slightly between runs.
-
-| Landing page | Live agent trace |
-|---|---|
-| ![Landing](screenshots/landing.png) | ![Trace](screenshots/trace.png) |
-
-**Nvidia → INVEST · high conviction** — strong moat (CUDA + ecosystem), excellent financials, dominant AI/GPU position. Bull: data-center growth, software moat, partnerships. Bear: competition (AMD/Intel), customer concentration, regulatory/supply-chain risk.
-
-![Nvidia verdict](screenshots/nvidia.png)
-
-**Zomato (Eternal Ltd) → INVEST · moderate conviction** — strong brand and large user base in a growing market; expansion into quick-commerce. Surfaced the company's own investor-relations PDFs and Moneycontrol as sources. Bear: profitability questions, regulatory risk, competition.
-
-![Zomato verdict](screenshots/zomato.png)
-
-**Boult Audio (small Indian startup) → INVEST · conviction capped** — impressive revenue growth and a clear product niche, but limited public data on margins/cash flow; conviction is deliberately tempered and the verdict says so.
-
-![Boult Audio verdict](screenshots/boult-audio.png)
-
 ---
 
 ## Roadmap
