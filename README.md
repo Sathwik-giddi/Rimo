@@ -153,7 +153,6 @@ repo/
 │  ├─ structured.ts   # JSON-mode structured-output helper
 │  ├─ state.ts        # LangGraph state annotation
 │  └─ events.ts       # typed trace events (SSE)
-├─ screenshots/       # example outputs
 └─ .env.example
 ```
 
